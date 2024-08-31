@@ -909,6 +909,17 @@ function Spamalyzer:SendAddonMessage(prefix, message, type, target)
 	-- Only gather messages we send to the whisper channel, because we'll catch everything else.
 	if target and target ~= "" and type == "WHISPER" then
 		self:StoreMessage(prefix, message, type, MY_NAME, target)
+	else
+		self:StoreMessage(prefix, message, type, sender, target)
+	end
+end
+
+function Spamalyzer:SendAddonMessageLogged(prefix, message, type, target)
+	-- Only gather messages we send to the whisper channel, because we'll catch everything else.
+	if target and target ~= "" and type == "WHISPER" then
+		self:StoreMessage(prefix, message, type, MY_NAME, target)
+	else
+		self:StoreMessage(prefix, message, type, sender, target)
 	end
 end
 
@@ -1039,15 +1050,19 @@ function Spamalyzer:OnEnable()
 	UpdateDataFeed()
 
 	self:RegisterEvent("CHAT_MSG_ADDON")
+	self:RegisterEvent("CHAT_MSG_ADDON_LOGGED")
+	self:RegisterEvent("BN_CHAT_MSG_ADDON")
 	self:RegisterEvent("GUILD_ROSTER_UPDATE")
 	self:RegisterEvent("UPDATE_CHAT_COLOR")
-
-	self:SecureHook("SendAddonMessage")
-
+	--self:SecureHook("C_ChatInfo.SendAddonMessage")
+	--self:SecureHook("SendAddonMessageLogged")
+	
+	--self:SecureHook(_G.C_ChatInfo, "SendAddonMessage", function(...))
+	
 	-- Break the server soft cap, as per http://us.battle.net/wow/en/forum/topic/2228413591?page=2#23
 	--@debug@
 	for index = 1, 65 do
-		_G.RegisterAddonMessagePrefix("DEBUG_" .. index)
+		_G.C_ChatInfo.RegisterAddonMessagePrefix("DEBUG_" .. index)
 	end
 	--@end-debug@
 
@@ -1100,6 +1115,14 @@ end
 
 
 function Spamalyzer:CHAT_MSG_ADDON(event, prefix, message, channel, sender)
+	self:StoreMessage(prefix, message, channel, sender)
+end
+
+function Spamalyzer:CHAT_MSG_ADDON_LOGGED(event, prefix, message, channel, sender)
+	self:StoreMessage(prefix, message, channel, sender)
+end
+
+function Spamalyzer:BN_CHAT_MSG_ADDON(event, prefix, message, channel, sender)
 	self:StoreMessage(prefix, message, channel, sender)
 end
 
