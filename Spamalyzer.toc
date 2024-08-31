@@ -1,4 +1,4 @@
-## Interface: 70200
+## Interface: 110002, 40400, 11503
 ## Title: Spamalyzer
 ## Notes: Tracks SendAddonMessage Spam
 ## Author: Torhal, Yoshimo
